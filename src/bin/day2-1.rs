@@ -37,9 +37,30 @@ named!(parse_line<CompleteByteSlice, Vec<Dir>>,
 );
 
 named!(parse_input<CompleteByteSlice, Vec<Vec<Dir>>>,
-    terminated!(many0!(parse_line), eof!())
+    many0!(parse_line)
 );
 
 fn main() {
-    let vv = parse_input(CompleteByteSlice(INPUT.as_bytes()));
+    let vv = parse_input(CompleteByteSlice(INPUT.as_bytes())).ok().unwrap().1;
+    let mut res = String::from("");
+    let mut digit = 5;
+
+    let map_up = [ 0, 1, 2, 3, 1, 2, 3, 4, 5, 6 ];
+    let map_down = [ 0, 4, 5, 6, 7, 8, 9, 7, 8, 9 ];
+    let map_left = [ 0, 1, 1, 2, 4, 4, 5, 7, 7, 8 ];
+    let map_right = [ 0, 2, 3, 3, 5, 6, 6, 8, 9, 9 ];
+
+    for v in vv.iter() {
+        for dir in v.iter() {
+            digit = match dir {
+                U => map_up[digit],
+                D => map_down[digit],
+                L => map_left[digit],
+                R => map_right[digit],
+            }
+        }
+        res.push_str(&digit.to_string());
+    }
+
+    println!("{}", res);
 }
